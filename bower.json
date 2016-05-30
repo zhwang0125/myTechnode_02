@@ -1,0 +1,22 @@
+{
+  "name": "myTechnode_02",
+  "description": "js install file",
+  "main": "index.js",
+  "authors": [
+    "zhwang <516275397@qq.com>"
+  ],
+  "license": "BSD-2-Clause",
+  "homepage": "https://github.com/zhwang0125/myTechnode_02",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "static/components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.0.3",
+    "angular": "~1.2.5"
+  }
+}
