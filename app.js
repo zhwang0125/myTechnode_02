@@ -37,3 +37,8 @@ var server = app.listen(port, function (err) {
 });
 
 var socketIO = require('socket.io');
+var io = socketIO.listen(server);
+
+io.sockets.on('connection', function(socket) {
+
+});
