@@ -35,3 +35,5 @@ var server = app.listen(port, function (err) {
 
     console.log("app start success and port " + port);
 });
+
+var socketIO = require('socket.io');
