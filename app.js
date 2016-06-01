@@ -38,6 +38,10 @@ var server = app.listen(port, function (err) {
 
 var socketIO = require('socket.io');
 var io = socketIO.listen(server);
+var SYSTEM = {
+    name: 'technode_机器人',
+    avatarUrl: 'http://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Robot_icon.svg/220px-Robot_icon.svg.png'
+}
 
 io.sockets.on('connection', function(socket) {
 
