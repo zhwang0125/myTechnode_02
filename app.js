@@ -7,12 +7,15 @@ var cookieParser = require('cookie-parser');
 var session = require('express-session');
 var MongoStore = require('connect-mongo')(session);
 var socketIO = require('socket.io');
-var io = socketIO.listen(server);
 var User = require('./controllers').User;
+var signedCookieParser = cookieParser('technode');
 var SYSTEM = {
     name: 'technode_机器人',
     avatarUrl: 'http://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Robot_icon.svg/220px-Robot_icon.svg.png'
 };
+var sessionStore = new MongoStore({
+    url: 'mongodb://localhost/technode_02'
+});
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -26,9 +29,7 @@ app.use(session({
     cookie: {
         maxAge: 60 * 1000
     },
-    store: new MongoStore({
-        url: 'mongodb://localhost/technode'
-    })
+    store: sessionStore
 }));
 app.use(express.static(path.join(__dirname, '/static')));
 
@@ -38,12 +39,12 @@ app.use(express.static(path.join(__dirname, '/static')));
 app.post('/validate', function (req, res, next) {
     var _userId = req.session._userId;
 
-    if(!_userId) {
+    if (!_userId) {
         return res.status(401).json(null)
     }
 
     User.findUserById(_userId, function (err, user) {
-        if(err) {
+        if (err) {
             return res.json(401, {
                 err: msg
             });
@@ -60,7 +61,7 @@ app.post('/login', function (req, res) {
     var email = req.body.email;
 
     User.findByEmailOrCreate(email, function (err, user) {
-        if(err) {
+        if (err) {
             return res.json(500, {
                 msg: err
             });
@@ -68,7 +69,7 @@ app.post('/login', function (req, res) {
 
         req.session._userId = user._id;
         User.online(user._id, function (err, user) {
-            if(err) {
+            if (err) {
                 return res.json(500, {
                     msg: err
                 });
@@ -91,8 +92,33 @@ var server = app.listen(port, function (err) {
     console.log("app start success and port " + port);
 });
 
+var io = socketIO.listen(server);
+
+io.set('authorization', function (handshakeData, accept) {
+    console.log(handshakeData);
+    signedCookieParser(handshakeData, {}, function (err) {
+        if (err) {
+            accept(err, false)
+        } else {
+            sessionStore.get(handshakeData.signedCookies['connect.sid'], function (err, session) {
+                if (err) {
+                    accept(err.message, false)
+                } else {
+                    handshakeData.session = session;
+                    if (session._userId) {
+                        accept(null, true)
+                    } else {
+                        accept('No login')
+                    }
+                }
+            })
+        }
+    })
+})
+
 io.sockets.on('connection', function (socket) {
     var _userId = socket.request.session._userId;
+    console.log(_userId);
 
     User.online(_userId, function (err, user) {
         if (err) {
@@ -109,5 +135,14 @@ io.sockets.on('connection', function (socket) {
             });
         }
 
+    });
+
+    socket.on('technode.read', function () {
+        User.getOnlineUsers(function (err, users) {
+
+            socket.emit('technode.read', {
+                users: users
+            });
+        });
     });
 });
