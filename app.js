@@ -31,6 +31,28 @@ app.use(session({
     })
 }));
 app.use(express.static(path.join(__dirname, '/static')));
+
+/**
+ * 验证
+ */
+app.post('/validate', function (req, res, next) {
+    var _userId = req.session._userId;
+
+    if(!_userId) {
+        return res.status(401).json(null)
+    }
+
+    User.findUserById(_userId, function (err, user) {
+        if(err) {
+            return res.json(401, {
+                err: msg
+            });
+        }
+
+        res.json(user);
+    });
+});
+
 /**
  * 登陆
  */
@@ -44,6 +66,7 @@ app.post('/login', function (req, res) {
             });
         }
 
+        req.session._userId = user._id;
         User.online(user._id, function (err, user) {
             if(err) {
                 return res.json(500, {
