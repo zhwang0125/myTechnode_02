@@ -1,0 +1,12 @@
+.navbar {
+    border-radius: 0px;
+}
+
+.navbar-right {
+    line-height: 50px;
+}
+
+.navbar-right img {
+    height: 30px;
+}
+

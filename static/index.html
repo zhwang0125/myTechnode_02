@@ -3,8 +3,8 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title>聊天室</title>
-    <link rel="stylesheet" href="/styles/room.css"/>
     <link rel="stylesheet" href="/components/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/styles/room.css"/>
     <script type="text/javascript" src="/socket.io/socket.io.js"></script>
     <script type="text/javascript" src="/components/jquery/dist/jquery.min.js"></script>
     <script type="text/javascript" src="/components/bootstrap/dist/js/bootstrap.min.js"></script>
@@ -15,15 +15,15 @@
     <div class="navbar navbar-inverse navbar-fixed-to">
         <div class="container">
             <div class="navbar-header">
-                <a class="navbar-brand" href="#">TechNode</a>
+                <a class="navbar-brand" href="#">Socket.io</a>
             </div>
             <nav class="collapse navbar-collapse" role="navigation">
-                <ul class="nav navbar-nav navbar-right">
+                <ul class="nav navbar-nav navbar-right" ng-show="me">
                     <li>
-                        <img class="img-rounded"/>
+                        <img ng-src="{{me.avatarUrl}}" class="img-rounded" title="{{me.name}}"/>
                     </li>
                     <li>
-                        <a href="">Log out</a>
+                        <a href="">退出</a>
                     </li>
                 </ul>
             </nav>
@@ -35,5 +35,6 @@
 
     <script type="text/javascript" src="/technode.js"></script>
     <script type="text/javascript" src="/route.js"></script>
+    <script type="text/javascript" src="/controllers/login.js"></script>
 </body>
 </html>

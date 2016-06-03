@@ -6,6 +6,13 @@ var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
 var MongoStore = require('connect-mongo')(session);
+var socketIO = require('socket.io');
+var io = socketIO.listen(server);
+var User = require('./controllers').User;
+var SYSTEM = {
+    name: 'technode_机器人',
+    avatarUrl: 'http://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Robot_icon.svg/220px-Robot_icon.svg.png'
+};
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -24,6 +31,31 @@ app.use(session({
     })
 }));
 app.use(express.static(path.join(__dirname, '/static')));
+/**
+ * 登陆
+ */
+app.post('/login', function (req, res) {
+    var email = req.body.email;
+
+    User.findByEmailOrCreate(email, function (err, user) {
+        if(err) {
+            return res.json(500, {
+                msg: err
+            });
+        }
+
+        User.online(user._id, function (err, user) {
+            if(err) {
+                return res.json(500, {
+                    msg: err
+                });
+            }
+
+            res.json(user);
+        });
+    });
+});
+
 app.use(function (req, res) {
     res.sendfile(path.join(__dirname, '/static/index.html'));
 });
@@ -35,14 +67,6 @@ var server = app.listen(port, function (err) {
 
     console.log("app start success and port " + port);
 });
-
-var socketIO = require('socket.io');
-var io = socketIO.listen(server);
-var User = require('./controllers/user').User;
-var SYSTEM = {
-    name: 'technode_机器人',
-    avatarUrl: 'http://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Robot_icon.svg/220px-Robot_icon.svg.png'
-};
 
 io.sockets.on('connection', function (socket) {
     var _userId = socket.request.session._userId;

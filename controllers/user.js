@@ -16,6 +16,7 @@ exports.findUserById = function (_userId, fn) {
  * @param fn
  */
 exports.findByEmailOrCreate = function (email, fn) {
+    console.log('.....');
     User.findOne({email: email}, function (err, user) {
         if (err) {
             return fn(err, null);

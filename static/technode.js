@@ -1,5 +1,9 @@
 angular
     .module('techNodeApp', ['ngRoute'])
-    .run(function ($window, $rootScope, $http, $location) {
-        $location.path('/login')
-    });
+    .run(['$window', '$rootScope', '$http', '$location', function ($window, $rootScope, $http, $location) {
+        $location.path('/login');
+
+        $rootScope.$on('login', function (evt, me) {
+            $rootScope.me = me;
+        });
+    }]);
