@@ -8,6 +8,7 @@ var session = require('express-session');
 var MongoStore = require('connect-mongo')(session);
 var socketIO = require('socket.io');
 var User = require('./controllers').User;
+var Message = require('./controllers').Message;
 var signedCookieParser = cookieParser('technode');
 var SYSTEM = {
     name: 'technode_机器人',
@@ -118,7 +119,6 @@ io.set('authorization', function (handshakeData, accept) {
 
 io.sockets.on('connection', function (socket) {
     var _userId = socket.request.session._userId;
-    console.log(_userId);
 
     User.online(_userId, function (err, user) {
         if (err) {
@@ -137,12 +137,46 @@ io.sockets.on('connection', function (socket) {
 
     });
 
+    // 在线人数
     socket.on('technode.read', function () {
         User.getOnlineUsers(function (err, users) {
 
             socket.emit('technode.read', {
-                users: users
+                users: users,
+                messages: []
             });
+        });
+    });
+
+    // 断开连接
+    socket.on('disconnect', function () {
+        User.offline(_userId, function (err, user) {
+            if (err) {
+                return socket.emit('err', {
+                    msg: err
+                });
+            }
+
+            // 通知其他用户，该用户下线了
+            socket.broadcast.emit('users.remove', user);
+            socket.broadcast.emit('message.add', {
+                content: user.name + '离开了聊天室',
+                creator: SYSTEM,
+                createAt: new Date()
+            });
+        });
+    });
+
+    // 发送消息
+    socket.on('message.create', function (message) {
+        Message.create(message, function (err, message) {
+            if(err){
+                return socket.emit('err', {
+                    msg: err
+                });
+            }
+
+            io.sockets.emit('message.add', message);
         });
     });
 });
