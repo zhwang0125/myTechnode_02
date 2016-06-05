@@ -115,7 +115,7 @@ io.set('authorization', function (handshakeData, accept) {
             })
         }
     })
-})
+});
 
 io.sockets.on('connection', function (socket) {
     var _userId = socket.request.session._userId;
