@@ -96,7 +96,6 @@ var server = app.listen(port, function (err) {
 var io = socketIO.listen(server);
 
 io.set('authorization', function (handshakeData, accept) {
-    console.log(handshakeData);
     signedCookieParser(handshakeData, {}, function (err) {
         if (err) {
             accept(err, false)
@@ -128,7 +127,7 @@ io.sockets.on('connection', function (socket) {
         }
         else {
             socket.broadcast.emit('users.add', user);
-            socket.broadcast.emit('messages.add', {
+            socket.broadcast.emit('message.add', {
                 content: user.name + '进入了聊天室',
                 creator: SYSTEM,
                 createAt: new Date()

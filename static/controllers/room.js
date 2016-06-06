@@ -1,16 +1,3 @@
-angular
-    .module('techNodeApp')
-    .constructor('MessageCreatorCtrl', function ($scope, socket) {
-        // 发消息
-        $scope.sendMessage = function () {
-            socket.emit('message.create', {
-                content: $scope.newMessage,
-                creator: $scope.me
-            });
-
-            $scope.newMessage = '';
-        };
-    });
 
 angular
     .module('techNodeApp')
@@ -39,4 +26,18 @@ angular
                 return item._id !== _id
             });
         });
+    });
+
+angular
+    .module('techNodeApp')
+    .controller('MessageCreatorCtrl', function ($scope, socket) {
+        // 发消息
+        $scope.sendMessage = function () {
+            socket.emit('message.create', {
+                content: $scope.newMessage,
+                creator: $scope.me
+            });
+
+            $scope.newMessage = '';
+        };
     });

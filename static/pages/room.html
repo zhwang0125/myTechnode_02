@@ -7,7 +7,12 @@
         <div class="panel-body">
             <div class="list-group">
                 <div class="list-group-item" ng-repeat="message in technode.messages">
-                    {{message.content}}
+                    <span ng-show="message.creator._id == me._id">
+                        <span style="color: red">{{message.creator.name}}</span>: {{message.content}}
+                    </span>
+                    <span ng-show="message.creator._id != me._id">
+                        {{message.creator.name}}: {{message.content}}
+                    </span>
                 </div>
             </div>
 
